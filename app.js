@@ -1,4 +1,64 @@
 $(function() {
+  
+    // -------------
+    // OMDB movie request, response
+    // -------------
+  	function getMovie(movieName) {
+      
+      var encodedMovieName = encodeURIComponent(movieName);
+      $.ajax({
+          'url': 'http://www.omdbapi.com/?t='+encodedMovieName,
+          'dataType': 'json',
+          'success': onMovieInfo
+      });
+    }
+  
+    function getSimilarity(movie1, movie2) {
+    		var value = 0;
+        
+        return value;
+    }
+    
+    function printMovie(movieInfo) {
+      console.log('Title: '+movieInfo.title);
+      console.log('Genre: '+movieInfo.genre);
+      console.log('Director: '+movieInfo.director);
+      console.log('Actors: '+movieInfo.actors);
+      if(movieInfo.rottenValue) {
+        console.log('Rotten Tomatoes points: '+movieInfo.rottenValue);
+      }
+   
+    }
+    
+    // from OMDB
+    function onMovieInfo(data) {
+       // console.log(data);
+      var movieInfo = {};
+      movieInfo.title = data.Title;
+      movieInfo.genre = data.Genre.split(', ');
+      movieInfo.actors = data.Actors.split(', ');
+      movieInfo.director = data.Director;
+      // ratings
+      var ratingsArray = data.Ratings;
+      var rottenValue;
+      for(rating of ratingsArray) {
+         if(rating.Source == 'Rotten Tomatoes') {
+           rottenValue = rating.Value;
+         }
+      }
+      if(rottenValue) {
+        movieInfo.rottenValue = rottenValue;
+      }
+      printMovie(movieInfo);    
+    }
+    getMovie('iron man');
+  
+  
+    // -------------
+    // OMDB ends here
+    // -------------
+  
+  
     // Handler for .ready() called.
     
     var currentName;
@@ -16,8 +76,9 @@ $(function() {
         //console.log('onMovieData: '+JSON.stringify(data));
         var result = {};
         for(var entry of data) {
-           console.log(entry);
-           if(entry.name.includes(currentName)) {
+           // console.log(entry);
+           
+           if(entry.name.toLowerCase().includes(currentName.toLowerCase())) {
              result[entry.name] = entry.movies;
            }
         }
@@ -50,3 +111,5 @@ $(function() {
     });
 
 });
+
+
